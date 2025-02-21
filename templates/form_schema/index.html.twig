@@ -21,7 +21,7 @@
                 <td>{{ form_schema.id }}</td>
                 <td>{{ form_schema.name }}</td>
                 <td>{{ form_schema.displayName }}</td>
-                <td>{{ form_schema.visiblity ? 'Yes' : 'No' }}</td>
+                <td>{{ form_schema.visibility ? 'Yes' : 'No' }}</td>
                 <td>
                     <a href="{{ path('app_form_schema_show', {'id': form_schema.id}) }}">show</a>
                     <a href="{{ path('app_form_schema_edit', {'id': form_schema.id}) }}">edit</a>

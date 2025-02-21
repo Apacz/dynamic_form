@@ -12,6 +12,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\FormSchema;
+use App\Form\DynamicFormType;
 use App\Form\FormSchemaType;
 use App\Repository\FormSchemaRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -86,5 +87,27 @@ class FormSchemaController extends AbstractController
         }
 
         return $this->redirectToRoute('app_form_schema_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/dynamic-form/{id}', name: 'app_dynamic_form')]
+    public function createDynamicForm(FormSchema $formSchema, Request $request): Response
+    {
+        $form = $this->createForm(DynamicFormType::class, null, ['form_schema' => $formSchema]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Process submitted data
+            $formData = $form->getData();
+
+            // Example: Save or process the data
+            $this->addFlash('success', 'Form submitted successfully!');
+            return $this->redirectToRoute('app_dynamic_form', ['id' => $formSchema->getId()]);
+        }
+
+        return $this->render('dynamic_form/index.html.twig', [
+            'form' => $form->createView(),
+            'formSchema' => $formSchema,
+        ]);
     }
 }

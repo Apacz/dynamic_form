@@ -49,5 +49,15 @@
                 btn.closest('.collection-item').remove();
             });
         });
+        document.querySelector('.camel-case-field').addEventListener('input', function () {
+            let value = this.value;
+            value = value.replace(/[_-]/g, ' '); // Replace underscores and dashes with spaces
+            value = value.replace(/\s(.)/g, function(match) {
+                return match.toUpperCase();
+            }); // Capitalize letters after spaces
+            value = value.replace(/\s/g, ''); // Remove spaces
+            value = value.charAt(0).toLowerCase() + value.slice(1); // Ensure first letter is lowercase
+            this.value = value;
+        });
     });
 </script>

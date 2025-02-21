@@ -24,7 +24,9 @@ class FormSchemaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class)
+            ->add('name', TextType::class, [
+                'attr' => ['class' => 'camel-case-field']
+            ])
             ->add('displayName', TextType::class)
             ->add('visibility', CheckboxType::class, [
                 'required' => false, // Default to true in processing

@@ -33,7 +33,7 @@ class FormSchema
     #[ORM\Column]
     private ?bool $visibility = null;
 
-    #[ORM\OneToMany(mappedBy: 'formSchema', targetEntity: FormField::class)]
+    #[ORM\OneToMany(mappedBy: 'formSchema', targetEntity: FormField::class, cascade: ['persist'])]
     private Collection $formFields;
 
     public function __construct()
@@ -110,5 +110,10 @@ class FormSchema
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->displayName;
     }
 }
