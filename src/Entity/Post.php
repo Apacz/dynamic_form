@@ -81,11 +81,18 @@ class Post
     #[Assert\Count(max: 4, maxMessage: 'post.too_many_tags')]
     private Collection $tags;
 
+    #[ORM\ManyToOne]
+    private ?FormSchema $formSchema = null;
+
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostFormValue::class, orphanRemoval: true)]
+    private Collection $postFormValues;
+
     public function __construct()
     {
         $this->publishedAt = new \DateTime();
         $this->comments = new ArrayCollection();
         $this->tags = new ArrayCollection();
+        $this->postFormValues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -194,5 +201,47 @@ class Post
     public function getTags(): Collection
     {
         return $this->tags;
+    }
+
+    public function getFormSchema(): ?FormSchema
+    {
+        return $this->formSchema;
+    }
+
+    public function setFormSchema(?FormSchema $formSchema): static
+    {
+        $this->formSchema = $formSchema;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PostFormValue>
+     */
+    public function getPostFormValues(): Collection
+    {
+        return $this->postFormValues;
+    }
+
+    public function addPostFormValue(PostFormValue $postFormValue): static
+    {
+        if (!$this->postFormValues->contains($postFormValue)) {
+            $this->postFormValues->add($postFormValue);
+            $postFormValue->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removePostFormValue(PostFormValue $postFormValue): static
+    {
+        if ($this->postFormValues->removeElement($postFormValue)) {
+            // set the owning side to null (unless already changed)
+            if ($postFormValue->getPost() === $this) {
+                $postFormValue->setPost(null);
+            }
+        }
+
+        return $this;
     }
 }

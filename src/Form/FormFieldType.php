@@ -36,10 +36,10 @@ class FormFieldType extends AbstractType
                 ])
                 ->add('type', ChoiceType::class, [
                     'choices' => [
-                        'Textarea' => TextType::class,
-                        'Date' => DateType::class,
-                        'DateTime' => DateTimeType::class,
-                        'Select' => ChoiceType::class,
+                        'Textarea' => 'text',
+                        'Date' => 'date',
+                        'DateTime' => 'dateType',
+                        'Select' => 'list',
                     ],
                     'placeholder' => 'Choose field type',
                     'attr' => ['class' => 'field-type'],

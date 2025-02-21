@@ -52,6 +52,25 @@ class FormSchemaController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}.json', name: 'app_form_schema_json_show', methods: ['GET'])]
+    public function showJson(FormSchema $formSchema): Response
+    {
+        $data = [];
+        foreach ($formSchema->getFormFieldsOrderedByCreatedAt() as $formField) {
+            $data[] = [
+                'id' => $formField->getId(),
+                'name' => $formField->getName(),
+                'required' => $formField->isRequired(),
+                'display_name' => $formField->getDisplayName(),
+                'type' => $formField->getType(),
+                'data_format' => $formField->getDateFormat(),
+                'list' => $formField->getOptionList()
+            ];
+        }
+
+        return $this->json($data);
+    }
+
     #[Route('/{id}', name: 'app_form_schema_show', methods: ['GET'])]
     public function show(FormSchema $formSchema): Response
     {

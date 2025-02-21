@@ -30,28 +30,14 @@ class FormSchemaRepository extends ServiceEntityRepository
         parent::__construct($registry, FormSchema::class);
     }
 
-//    /**
-//     * @return FormSchema[] Returns an array of FormSchema objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('f')
-//            ->andWhere('f.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('f.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findFirst(?int $limit = null): array
+    {
+        $qb = $this->createQueryBuilder('fs')
+            ->orderBy('fs.createdAt', 'ASC');
+        if ($limit) {
+            $qb->setMaxResults($limit);
+        }
 
-//    public function findOneBySomeField($value): ?FormSchema
-//    {
-//        return $this->createQueryBuilder('f')
-//            ->andWhere('f.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        return $qb->getQuery()->getResult();
+    }
 }

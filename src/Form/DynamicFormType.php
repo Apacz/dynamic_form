@@ -6,9 +6,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\FormSchema;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class DynamicFormType extends AbstractType
 {
@@ -46,5 +49,16 @@ class DynamicFormType extends AbstractType
     {
         $resolver->setRequired('form_schema');
         $resolver->setAllowedTypes('form_schema', FormSchema::class);
+    }
+
+    private function mapFieldType(string $type): string
+    {
+        return match ($type) {
+            'text' => TextType::class,
+            'date' => DateType::class,
+            'dateTime' => DateTimeType::class,
+            'list' => ChoiceType::class,
+            default => TextType::class, // Default to TextType
+        };
     }
 }

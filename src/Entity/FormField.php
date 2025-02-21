@@ -1,17 +1,10 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace App\Entity;
 
 use App\Repository\FormFieldRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -30,7 +23,7 @@ class FormField
     private ?string $displayName = null;
 
     #[ORM\Column]
-    private ?bool $required = null;
+    private bool $required = true;
 
     #[ORM\Column(length: 255)]
     private ?string $type = null;
@@ -43,6 +36,18 @@ class FormField
 
     #[ORM\ManyToOne(inversedBy: 'formFields')]
     private ?FormSchema $formSchema = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\OneToMany(mappedBy: 'field', targetEntity: PostFormValue::class, orphanRemoval: true)]
+    private Collection $postFormValues;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable(); // Set timestamp on creation
+        $this->postFormValues = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -73,7 +78,7 @@ class FormField
         return $this;
     }
 
-    public function isRequired(): ?bool
+    public function isRequired(): bool
     {
         return $this->required;
     }
@@ -136,5 +141,43 @@ class FormField
     public function __toString(): string
     {
         return $this->displayName;
+    }
+
+    /**
+     * @return Collection<int, PostFormValue>
+     */
+    public function getPostFormValues(): Collection
+    {
+        return $this->postFormValues;
+    }
+
+    public function addPostFormValue(PostFormValue $postFormValue): static
+    {
+        if (!$this->postFormValues->contains($postFormValue)) {
+            $this->postFormValues->add($postFormValue);
+            $postFormValue->setField($this);
+        }
+
+        return $this;
+    }
+
+    public function removePostFormValue(PostFormValue $postFormValue): static
+    {
+        if ($this->postFormValues->removeElement($postFormValue)) {
+            // set the owning side to null (unless already changed)
+            if ($postFormValue->getField() === $this) {
+                $postFormValue->setField(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTimeImmutable|null
+     */
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 }

@@ -11,14 +11,18 @@
 
 namespace App\Form;
 
+use App\Entity\FormSchema;
 use App\Entity\Post;
 use App\Form\Type\DateTimePickerType;
 use App\Form\Type\TagsInputType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -70,6 +74,12 @@ final class PostType extends AbstractType
                 'label' => 'label.tags',
                 'required' => false,
             ])
+            ->add('formSchema', EntityType::class, [
+                'class' => FormSchema::class,
+                'required' => false,
+                'placeholder' => 'Choose a form schema',
+                'attr' => ['class' => 'form-schema-selector']
+            ])
             // form events let you modify information or fields at different steps
             // of the form handling process.
             // See https://symfony.com/doc/current/form/events.html
@@ -81,6 +91,30 @@ final class PostType extends AbstractType
                 }
             })
         ;
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+            $form = $event->getForm();
+
+            if (!isset($data['formSchema']) || empty($data['formSchema'])) {
+                return;
+            }
+
+            // Fetch fields dynamically
+            $this->addDynamicFields($form, $data['formSchema']);
+        });
+    }
+
+    private function addDynamicFields(FormInterface $form, int $formSchemaId): void
+    {
+        // You can inject the repository or fetch fields via Ajax instead
+        // Assume we have an array of fields here (you will get this via Ajax)
+        $fields = [
+            ['name' => 'exampleField', 'type' => TextType::class]
+        ];
+
+        foreach ($fields as $field) {
+            $form->add($field['name'], $field['type']);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

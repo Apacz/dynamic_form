@@ -13,7 +13,7 @@
 
 {{ form_start(form, {attr: attr|default({})}) }}
     {{ form_widget(form) }}
-
+    <div id="dynamic-fields"></div>
     <button type="submit" class="{{ button_css|default("btn btn-primary") }}">
         <i class="fa fa-save" aria-hidden="true"></i> {{ button_label|default('label.create_post'|trans) }}
     </button>
@@ -24,3 +24,38 @@
         </a>
     {% endif %}
 {{ form_end(form) }}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.form-schema-selector').on('change', function () {
+            var formSchemaId = $(this).val();
+            if (!formSchemaId) {
+                return;
+            }
+
+            $.ajax({
+                url: '/pl/admin/form_schema/' + formSchemaId + '.json',  // Calls your action
+                method: 'GET',
+                success: function (data) {
+                    let container = $('#dynamic-fields');
+                    container.empty(); // Clear previous fields
+
+                    data.forEach(function (field) {
+                        let inputField = $('<input>')
+                            .attr('type', field.type === 'textarea' ? 'textarea' : 'text')
+                            .attr('name', field.name)
+                            .attr('id', field.name)
+                            .attr('placeholder', field.display_name)
+                            .addClass('form-control');
+                        if (field.required) {
+                            inputField.attr('required');
+                        }
+                        container.append('<label for="' + field.name + '">' + field.display_name + '</label>');
+                        container.append(inputField);
+                    });
+                }
+            });
+        });
+    });
+</script>

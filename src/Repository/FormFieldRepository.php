@@ -30,28 +30,14 @@ class FormFieldRepository extends ServiceEntityRepository
         parent::__construct($registry, FormField::class);
     }
 
-//    /**
-//     * @return FormField[] Returns an array of FormField objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('f')
-//            ->andWhere('f.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('f.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findFirst(?int $limit = null): array
+    {
+        $qb = $this->createQueryBuilder('ff')
+            ->orderBy('ff.createdAt', 'ASC');
+        if ($limit) {
+            $qb->setMaxResults($limit);
+        }
 
-//    public function findOneBySomeField($value): ?FormField
-//    {
-//        return $this->createQueryBuilder('f')
-//            ->andWhere('f.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        return $qb->getQuery()->getResult();
+    }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace App\Entity;
 
 use App\Repository\FormSchemaRepository;
@@ -31,14 +22,22 @@ class FormSchema
     private ?string $displayName = null;
 
     #[ORM\Column]
-    private ?bool $visibility = null;
+    private bool $visibility = true;
 
     #[ORM\OneToMany(mappedBy: 'formSchema', targetEntity: FormField::class, cascade: ['persist'])]
     private Collection $formFields;
 
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\OneToMany(mappedBy: 'schema', targetEntity: PostFormValue::class, orphanRemoval: true)]
+    private Collection $postFormValues;
+
     public function __construct()
     {
         $this->formFields = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable(); // Set timestamp on creation
+        $this->postFormValues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -70,7 +69,7 @@ class FormSchema
         return $this;
     }
 
-    public function isVisibility(): ?bool
+    public function isVisibility(): bool
     {
         return $this->visibility;
     }
@@ -88,6 +87,29 @@ class FormSchema
     public function getFormFields(): Collection
     {
         return $this->formFields;
+    }
+
+    /**
+     * @return Collection<int, FormField>
+     */
+    public function getFormFieldsOrderedByCreatedAt(): Collection
+    {
+        $iterator = $this->formFields->getIterator();
+
+        $iterator->uasort(fn(FormField $a, FormField $b) =>
+            $a->getCreatedAt() <=> $b->getCreatedAt()
+        );
+
+        return new ArrayCollection(iterator_to_array($iterator));
+    }
+
+
+    /**
+     * @return \DateTimeImmutable|null
+     */
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
     }
 
     public function addFormField(FormField $formField): static
@@ -115,5 +137,35 @@ class FormSchema
     public function __toString(): string
     {
         return $this->displayName;
+    }
+
+    /**
+     * @return Collection<int, PostFormValue>
+     */
+    public function getPostFormValues(): Collection
+    {
+        return $this->postFormValues;
+    }
+
+    public function addPostFormValue(PostFormValue $postFormValue): static
+    {
+        if (!$this->postFormValues->contains($postFormValue)) {
+            $this->postFormValues->add($postFormValue);
+            $postFormValue->setSchema($this);
+        }
+
+        return $this;
+    }
+
+    public function removePostFormValue(PostFormValue $postFormValue): static
+    {
+        if ($this->postFormValues->removeElement($postFormValue)) {
+            // set the owning side to null (unless already changed)
+            if ($postFormValue->getSchema() === $this) {
+                $postFormValue->setSchema(null);
+            }
+        }
+
+        return $this;
     }
 }
