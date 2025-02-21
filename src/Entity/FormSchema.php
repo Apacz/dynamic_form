@@ -31,7 +31,7 @@ class FormSchema
     private ?string $displayName = null;
 
     #[ORM\Column]
-    private ?bool $visiblity = null;
+    private ?bool $visibility = null;
 
     #[ORM\OneToMany(mappedBy: 'formSchema', targetEntity: FormField::class)]
     private Collection $formFields;
@@ -70,14 +70,14 @@ class FormSchema
         return $this;
     }
 
-    public function isVisiblity(): ?bool
+    public function isVisibility(): ?bool
     {
-        return $this->visiblity;
+        return $this->visibility;
     }
 
-    public function setVisiblity(bool $visiblity): static
+    public function setVisibility(bool $visibility): static
     {
-        $this->visiblity = $visiblity;
+        $this->visibility = $visibility;
 
         return $this;
     }

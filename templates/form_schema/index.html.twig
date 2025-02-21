@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}FormSchema index{% endblock %}
+
+{% block body %}
+    <h1>FormSchema index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>DisplayName</th>
+                <th>Visiblity</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for form_schema in form_schemas %}
+            <tr>
+                <td>{{ form_schema.id }}</td>
+                <td>{{ form_schema.name }}</td>
+                <td>{{ form_schema.displayName }}</td>
+                <td>{{ form_schema.visiblity ? 'Yes' : 'No' }}</td>
+                <td>
+                    <a href="{{ path('app_form_schema_show', {'id': form_schema.id}) }}">show</a>
+                    <a href="{{ path('app_form_schema_edit', {'id': form_schema.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_form_schema_new') }}">Create new</a>
+{% endblock %}

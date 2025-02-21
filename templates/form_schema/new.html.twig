@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New FormSchema{% endblock %}
+
+{% block body %}
+    <h1>Create new FormSchema</h1>
+
+    {{ include('form_schema/_form.html.twig') }}
+
+    <a href="{{ path('app_form_schema_index') }}">back to list</a>
+{% endblock %}

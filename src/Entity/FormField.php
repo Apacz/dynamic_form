@@ -38,8 +38,8 @@ class FormField
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $dateFormat = null;
 
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private ?array $OptionList = null;
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    private ?string $OptionList = null;
 
     #[ORM\ManyToOne(inversedBy: 'formFields')]
     private ?FormSchema $formSchema = null;
@@ -109,12 +109,12 @@ class FormField
         return $this;
     }
 
-    public function getOptionList(): ?array
+    public function getOptionList(): ?string
     {
         return $this->OptionList;
     }
 
-    public function setOptionList(?array $OptionList): static
+    public function setOptionList(?string $OptionList): static
     {
         $this->OptionList = $OptionList;
 
