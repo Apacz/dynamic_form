@@ -100,7 +100,7 @@ final class PostType extends AbstractType
             }
 
             // Fetch fields dynamically
-            $this->addDynamicFields($form, $data['formSchema']);
+//            $this->addDynamicFields($form, $data['formSchema']);
         });
     }
 
@@ -121,6 +121,7 @@ final class PostType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Post::class,
+            'allow_extra_fields' => true, // Allow extra fields dynamically
         ]);
     }
 }
