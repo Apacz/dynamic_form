@@ -12,10 +12,15 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\FormField;
+use App\Entity\FormSchema;
 use App\Entity\Post;
+use App\Entity\PostFormValue;
 use App\Entity\User;
 use App\Event\CommentCreatedEvent;
 use App\Form\CommentType;
+use App\Repository\FormSchemaRepository;
+use App\Repository\PostFormValueRepository;
 use App\Repository\PostRepository;
 use App\Repository\TagRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,6 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -92,6 +98,74 @@ final class BlogController extends AbstractController
         return $this->render('blog/post_show.html.twig', ['post' => $post]);
     }
 
+
+    #[Route('/{formSchemaName}/search', name: 'post_search', methods: ['GET', 'POST'])]
+    public function searchByFromSchema(Request $request, string $formSchemaName, FormSchemaRepository $formSchemaRepository, PostFormValueRepository $postFormValueRepository)
+    {
+        /** @var FormSchema|null $formSchema */
+        $formSchema = $formSchemaRepository->findOneBy(['name' => $formSchemaName]);
+        if (!$formSchema) {
+            throw new AccessDeniedHttpException();
+        }
+        // Create a form dynamically based on the form schema fields
+        $formFields = $formSchema->getFormFields(); // Assume this gives you an iterable collection of form fields
+        $formData = [];
+
+        // Create an array to hold form data that will be used for the search form (for POST requests)
+        foreach ($formFields as $field) {
+            // Initialize a new input field based on the field type
+            switch ($field->getType()) {
+                case 'text':
+                    $formData[$field->getName()] = $request->get($field->getName(), ''); // For text fields
+                    break;
+                case 'date':
+                case 'dateTime':
+                    $formData[$field->getName() . '_from'] = $request->get($field->getName() . '_from', ''); // From date range
+                    $formData[$field->getName() . '_to'] = $request->get($field->getName() . '_to', ''); // To date range
+                    break;
+                case 'list':
+                    $formData[$field->getName()] = $request->get($field->getName(), ''); // For list fields
+                    break;
+                case 'checkbox':
+                    $formData[$field->getName()] = $request->get($field->getName(), null) ? true : false;  // true for checked, false for unchecked
+                    break;
+                case 'cost':
+                    $formData[$field->getName()] = $request->get($field->getName(), null);
+                    if ($formData[$field->getName()]) {
+                        $formData[$field->getName()] = number_format($formData[$field->getName()], 2, '.', '');  // Format to two decimals
+                    }
+                    break;
+                case 'number':
+                case 'email':
+                case 'url':
+                    $formData[$field->getName()] = $request->get($field->getName(), null);
+                    break;
+
+                // Add additional cases for other types like 'checkbox', 'email', etc.
+            }
+        }
+
+        // Handling POST search logic here, if needed.
+        if ($request->isMethod('POST')) {
+            $postFormValues = $postFormValueRepository->searchByFields($formData);
+            // Perform the search logic (e.g., querying the database using the values from $formData)
+            // You could search based on the inputs and return the results
+            // For now, we can just return the form data as a placeholder
+            return $this->render('blog/search_results.html.twig', [
+                'formSchema' => $formSchema,
+                'formData' => $formData,
+                'postFormValues' => $postFormValues
+            ]);
+        }
+
+        // Render the search form view (for GET requests)
+        return $this->render('blog/search_form.html.twig', [
+            'formSchema' => $formSchema,
+            'formFields' => $formFields,
+        ]);
+    }
+
+
     /**
      * NOTE: The #[MapEntity] mapping is required because the route parameter
      * (postSlug) doesn't match any of the Doctrine entity properties (slug).
@@ -115,6 +189,7 @@ final class BlogController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
             $entityManager->persist($comment);
             $entityManager->flush();
 

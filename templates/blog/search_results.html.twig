@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Search Results for {{ formSchema.name }}</h1>
+
+    <form method="get" action="{{ path('post_search', { formSchemaName: formSchema.name }) }}">
+        {% for field in formSchema.formFields %}
+            <div class="form-group">
+                <label for="{{ field.name }}">{{ field.name }}</label>
+
+                {% if field.type == 'text' %}
+                    <input type="text" name="{{ field.name }}" id="{{ field.name }}" value="{{ formData[field.name] ?? '' }}" class="form-control" />
+
+                {% elseif field.type == 'date' or field.type == 'dateTime' %}
+                    <input type="date" name="{{ field.name }}_from" value="{{ formData[field.name ~ '_from'] ?? '' }}" class="form-control" />
+                    <input type="date" name="{{ field.name }}_to" value="{{ formData[field.name ~ '_to'] ?? '' }}" class="form-control" />
+
+                {% elseif field.type == 'list' %}
+                    <select name="{{ field.name }}" id="{{ field.name }}" class="form-control">
+                        <option value="">Select...</option>
+                        <!-- Populate options dynamically from field choices -->
+                    </select>
+
+                {% elseif field.type == 'checkbox' %}
+                    <input type="checkbox" name="{{ field.name }}" value="1" {{ formData[field.name] ? 'checked' : '' }} />
+
+                {% elseif field.type == 'cost' %}
+                    <input type="number" name="{{ field.name }}" value="{{ formData[field.name] ?? '' }}" class="form-control" step="0.01" />
+
+                {% elseif field.type == 'number' or field.type == 'email' or field.type == 'url' %}
+                    <input type="text" name="{{ field.name }}" value="{{ formData[field.name] ?? '' }}" class="form-control" />
+
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <h2>Results</h2>
+    {% if postFormValues is not empty %}
+        <ul>
+            {% for postFormValue in postFormValues %}
+                <li>{{ postFormValue.value }} - {{ postFormValue.field.name }} - {{ postFormValue.schema.name }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+{% endblock %}

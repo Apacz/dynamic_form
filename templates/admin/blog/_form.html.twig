@@ -42,15 +42,64 @@
                     container.empty(); // Clear previous fields
 
                     data.forEach(function (field) {
-                        let inputField = $('<input>')
-                            .attr('type', field.type === 'textarea' ? 'textarea' : 'text')
-                            .attr('name', field.name)
-                            .attr('id', field.name)
-                            .attr('placeholder', field.display_name)
-                            .addClass('form-control');
-                        if (field.required) {
-                            inputField.attr('required');
+                        let inputField;
+                        let fieldName = 'post[extra][' + field.name + ']';
+                        // Handle different field types
+                        switch (field.type) {
+                            case 'textarea':
+                                inputField = $('<textarea>')
+                                    .attr('name', fieldName)
+                                    .attr('id', field.name)
+                                    .attr('placeholder', field.display_name)
+                                    .addClass('form-control');
+                                break;
+                            case 'checkbox':
+                                inputField = $('<input>')
+                                    .attr('type', 'checkbox')
+                                    .attr('name', fieldName)
+                                    .attr('id', field.name)
+                                    .addClass('form-check-input');
+                                container.append('<label for="' + field.name + '" class="form-check-label">' + field.display_name + '</label>');
+                                break;
+                            case 'number':
+                            case 'cost':
+                                inputField = $('<input>')
+                                    .attr('type', 'number')
+                                    .attr('name', fieldName)
+                                    .attr('id', field.name)
+                                    .attr('placeholder', field.display_name)
+                                    .attr('step', '0.01')
+                                    .addClass('form-control');
+                                break;
+                            case 'email':
+                                inputField = $('<input>')
+                                    .attr('type', 'email')
+                                    .attr('name', fieldName)
+                                    .attr('id', field.name)
+                                    .attr('placeholder', field.display_name)
+                                    .addClass('form-control');
+                                break;
+                            case 'url':
+                                inputField = $('<input>')
+                                    .attr('type', 'url')
+                                    .attr('name', fieldName)
+                                    .attr('id', field.name)
+                                    .attr('placeholder', field.display_name)
+                                    .addClass('form-control');
+                                break;
+                            default:
+                                inputField = $('<input>')
+                                    .attr('type', 'text')
+                                    .attr('name', fieldName)
+                                    .attr('id', field.name)
+                                    .attr('placeholder', field.display_name)
+                                    .addClass('form-control');
                         }
+
+                        if (field.required) {
+                            inputField.attr('required', 'required');
+                        }
+
                         container.append('<label for="' + field.name + '">' + field.display_name + '</label>');
                         container.append(inputField);
                     });

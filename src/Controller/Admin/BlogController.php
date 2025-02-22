@@ -11,7 +11,9 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\FormField;
 use App\Entity\Post;
+use App\Entity\PostFormValue;
 use App\Entity\User;
 use App\Form\PostType;
 use App\Repository\PostRepository;
@@ -90,6 +92,35 @@ final class BlogController extends AbstractController
         // throws an exception if the form has not been submitted.
         // See https://symfony.com/doc/current/forms.html#processing-forms
         if ($form->isSubmitted() && $form->isValid()) {
+            $extraData = $request->request->get('post')['extra'] ?? [];
+
+            foreach ($extraData as $fieldName => $value) {
+                if (!empty($value)) {
+                    // Check if the field exists in the post's form values
+                    $formField = $entityManager->getRepository(FormField::class)->findOneBy(['name' => $fieldName]);
+
+                    if ($formField) {
+                        // Check if PostFormValue exists for this field and update or create a new one
+                        $existingPostFormValue = $entityManager->getRepository(PostFormValue::class)->findOneBy([
+                            'post' => $post,
+                            'field' => $formField,
+                        ]);
+
+                        if ($existingPostFormValue) {
+                            // Update existing PostFormValue
+                            $existingPostFormValue->setValue($value);
+                        } else {
+                            // Create new PostFormValue
+                            $postFormValue = new PostFormValue();
+                            $postFormValue->setPost($post);
+                            $postFormValue->setField($formField);
+                            $postFormValue->setValue($value);
+
+                            $entityManager->persist($postFormValue);
+                        }
+                    }
+                }
+            }
             $entityManager->persist($post);
             $entityManager->flush();
 
@@ -141,6 +172,35 @@ final class BlogController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $extraData = $request->request->get('post')['extra'] ?? [];
+
+            foreach ($extraData as $fieldName => $value) {
+                if (!empty($value)) {
+                    // Check if the field exists in the post's form values
+                    $formField = $entityManager->getRepository(FormField::class)->findOneBy(['name' => $fieldName]);
+
+                    if ($formField) {
+                        // Check if PostFormValue exists for this field and update or create a new one
+                        $existingPostFormValue = $entityManager->getRepository(PostFormValue::class)->findOneBy([
+                            'post' => $post,
+                            'field' => $formField,
+                        ]);
+
+                        if ($existingPostFormValue) {
+                            // Update existing PostFormValue
+                            $existingPostFormValue->setValue($value);
+                        } else {
+                            // Create new PostFormValue
+                            $postFormValue = new PostFormValue();
+                            $postFormValue->setPost($post);
+                            $postFormValue->setField($formField);
+                            $postFormValue->setValue($value);
+
+                            $entityManager->persist($postFormValue);
+                        }
+                    }
+                }
+            }
             $entityManager->flush();
             $this->addFlash('success', 'post.updated_successfully');
 

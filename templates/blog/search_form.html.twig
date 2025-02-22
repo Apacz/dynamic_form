@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Search Form</h1>
+
+    {{ form_start(form, {attr: {'novalidate': 'novalidate'}}) }}
+
+    <div class="form-group">
+        {% for field in formFields %}
+            <div class="form-group">
+                <label for="{{ field.name }}">{{ field.display_name }}</label>
+
+                {% if field.type == 'text' %}
+                    <input type="text" name="{{ field.name }}" id="{{ field.name }}" class="form-control" value="{{ formData[field.name] ?? '' }}" placeholder="{{ field.display_name }}">
+
+                {% elseif field.type == 'number' %}
+                    <input type="number" name="{{ field.name }}" id="{{ field.name }}" class="form-control" value="{{ formData[field.name] ?? '' }}" step="0.01">
+
+                {% elseif field.type == 'cost' %}
+                    <input type="number" name="{{ field.name }}" id="{{ field.name }}" class="form-control" value="{{ formData[field.name] ?? '' }}" step="0.01">
+
+                {% elseif field.type == 'checkbox' %}
+                    <input type="checkbox" name="{{ field.name }}" id="{{ field.name }}" class="form-check-input" value="1" {% if formData[field.name] == 1 %}checked{% endif %}>
+
+                {% elseif field.type == 'email' %}
+                    <input type="email" name="{{ field.name }}" id="{{ field.name }}" class="form-control" value="{{ formData[field.name] ?? '' }}">
+
+                {% elseif field.type == 'url' %}
+                    <input type="url" name="{{ field.name }}" id="{{ field.name }}" class="form-control" value="{{ formData[field.name] ?? '' }}">
+
+                {% elseif field.type == 'date' %}
+                    <div class="form-inline">
+                        <input type="date" name="{{ field.name }}_from" id="{{ field.name }}_from" class="form-control" value="{{ formData[field.name ~ '_from'] ?? '' }}">
+                        <span>to</span>
+                        <input type="date" name="{{ field.name }}_to" id="{{ field.name }}_to" class="form-control" value="{{ formData[field.name ~ '_to'] ?? '' }}">
+                    </div>
+
+                {% elseif field.type == 'dateTime' %}
+                    <div class="form-inline">
+                        <input type="datetime-local" name="{{ field.name }}_from" id="{{ field.name }}_from" class="form-control" value="{{ formData[field.name ~ '_from'] ?? '' }}">
+                        <span>to</span>
+                        <input type="datetime-local" name="{{ field.name }}_to" id="{{ field.name }}_to" class="form-control" value="{{ formData[field.name ~ '_to'] ?? '' }}">
+                    </div>
+
+                {% elseif field.type == 'list' %}
+                    <select name="{{ field.name }}" id="{{ field.name }}" class="form-control">
+                        <option value="">Select</option>
+                        {% for option in field.options %}
+                            <option value="{{ option }}" {% if formData[field.name] == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
+
+                {% if field.required %}
+                    <div class="text-danger">This field is required</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        <i class="fa fa-search" aria-hidden="true"></i> Search
+    </button>
+
+    {% if include_back_to_home_link|default(false) %}
+        <a href="{{ path('admin_post_index') }}" class="btn btn-link">
+            <i class="fa fa-list-alt" aria-hidden="true"></i> Back to list
+        </a>
+    {% endif %}
+
+    {{ form_end(form) }}
+{% endblock %}

@@ -103,4 +103,39 @@ class PostRepository extends ServiceEntityRepository
             return 2 <= $term->length();
         });
     }
+
+    public function searchByFields(array $criteria)
+    {
+        $qb = $this->createQueryBuilder('pfv')
+            ->leftJoin('pfv.post', 'p')
+            ->leftJoin('pfv.schema', 's')
+            ->leftJoin('pfv.field', 'f');
+
+        // Dynamically filter based on the criteria provided
+        foreach ($criteria as $key => $value) {
+            if (empty($value)) {
+                continue;
+            }
+
+            if (strpos($key, '_from') !== false || strpos($key, '_to') !== false) {
+                // Handle date ranges
+                $fieldName = str_replace('_from', '', $key);
+                $dateFrom = $criteria[$fieldName . '_from'] ?? null;
+                $dateTo = $criteria[$fieldName . '_to'] ?? null;
+
+                if ($dateFrom && $dateTo) {
+                    $qb->andWhere('p.createdAt BETWEEN :dateFrom AND :dateTo')
+                        ->setParameter('dateFrom', $dateFrom)
+                        ->setParameter('dateTo', $dateTo);
+                }
+            } else {
+                // For text, checkbox, number, etc.
+                $qb->andWhere('f.name = :fieldName AND pfv.value LIKE :value')
+                    ->setParameter('fieldName', $key)
+                    ->setParameter('value', '%' . $value . '%');
+            }
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
