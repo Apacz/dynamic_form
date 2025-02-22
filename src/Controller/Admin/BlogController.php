@@ -16,6 +16,7 @@ use App\Entity\Post;
 use App\Entity\PostFormValue;
 use App\Entity\User;
 use App\Form\PostType;
+use App\Repository\FormSchemaRepository;
 use App\Repository\PostRepository;
 use App\Security\PostVoter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -59,10 +60,14 @@ final class BlogController extends AbstractController
     public function index(
         #[CurrentUser] User $user,
         PostRepository $posts,
+        FormSchemaRepository $formSchemaRepository
     ): Response {
         $authorPosts = $posts->findBy(['author' => $user], ['publishedAt' => 'DESC']);
 
-        return $this->render('admin/blog/index.html.twig', ['posts' => $authorPosts]);
+        return $this->render('admin/blog/index.html.twig', [
+            'posts' => $authorPosts,
+            'formSchemas' => $formSchemaRepository->findAll()
+        ]);
     }
 
     /**

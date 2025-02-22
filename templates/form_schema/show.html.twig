@@ -1,34 +1,75 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}FormSchema{% endblock %}
+{% block title %}{{ 'Form Schema Details'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>FormSchema</h1>
+    <h1>{{ 'Form Schema'|trans }}</h1>
 
-    <table class="table">
+    <table class="table table-striped table-borderless">
         <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ form_schema.id }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ form_schema.name }}</td>
-            </tr>
-            <tr>
-                <th>DisplayName</th>
-                <td>{{ form_schema.displayName }}</td>
-            </tr>
-            <tr>
-                <th>Visiblity</th>
-                <td>{{ form_schema.visibility ? 'Yes' : 'No' }}</td>
-            </tr>
+        <tr>
+            <th>{{ 'ID'|trans }}</th>
+            <td>{{ form_schema.id }}</td>
+        </tr>
+        <tr>
+            <th>{{ 'Name'|trans }}</th>
+            <td>{{ form_schema.name }}</td>
+        </tr>
+        <tr>
+            <th>{{ 'Display Name'|trans }}</th>
+            <td>{{ form_schema.displayName }}</td>
+        </tr>
+        <tr>
+            <th>{{ 'Visibility'|trans }}</th>
+            <td>{{ form_schema.visibility ? 'Yes' : 'No' }}</td>
+        </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_form_schema_index') }}">back to list</a>
+    <h2 class="mt-4">{{ 'Form Fields'|trans }}</h2>
 
-    <a href="{{ path('app_form_schema_edit', {'id': form_schema.id}) }}">edit</a>
+    {% if form_schema.formFields is not empty %}
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>{{ 'ID'|trans }}</th>
+                <th>{{ 'Name'|trans }}</th>
+                <th>{{ 'Display Name'|trans }}</th>
+                <th>{{ 'Required'|trans }}</th>
+                <th>{{ 'Type'|trans }}</th>
+                <th>{{ 'Date Format'|trans }}</th>
+                <th>{{ 'Option List'|trans }}</th>
+                <th>{{ 'Created At'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for field in form_schema.formFields %}
+                <tr>
+                    <td>{{ field.id }}</td>
+                    <td>{{ field.name }}</td>
+                    <td>{{ field.displayName }}</td>
+                    <td>{{ field.required ? 'Yes' : 'No' }}</td>
+                    <td>{{ field.type }}</td>
+                    <td>{{ field.dateFormat ?: '-' }}</td>
+                    <td>{{ field.optionList ?: '-' }}</td>
+                    <td>{{ field.createdAt ? field.createdAt|date('Y-m-d H:i') : '-' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-muted">{{ 'No fields found for this form schema.'|trans }}</p>
+    {% endif %}
 
-    {{ include('form_schema/_delete_form.html.twig') }}
+    <div class="mt-4">
+        <a href="{{ path('app_form_schema_index') }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> {{ 'Back to list'|trans }}
+        </a>
+
+        <a href="{{ path('app_form_schema_edit', {'id': form_schema.id}) }}" class="btn btn-primary">
+            <i class="fa fa-edit"></i> {{ 'Edit'|trans }}
+        </a>
+
+        {{ include('form_schema/_delete_form.html.twig') }}
+    </div>
 {% endblock %}

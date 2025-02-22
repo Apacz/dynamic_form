@@ -104,6 +104,10 @@
                 <source>label.create_post</source>
                 <target>Dodaj artykuł</target>
             </trans-unit>
+            <trans-unit id="label.create_form_schema">
+                <source>label.create_form_schema</source>
+                <target>Dodaj Formularz</target>
+            </trans-unit>
             <trans-unit id="label.save_and_create_new">
                 <source>label.save_and_create_new</source>
                 <target>Zapisz i dodaj kolejny</target>
@@ -189,6 +193,10 @@
             <trans-unit id="menu.post_list">
                 <source>menu.post_list</source>
                 <target>Lista artykułów</target>
+            </trans-unit>
+            <trans-unit id="menu.form_schema_list">
+                <source>menu.form_schema_list</source>
+                <target>Lista szablonów formularzy</target>
             </trans-unit>
             <trans-unit id="menu.back_to_blog">
                 <source>menu.back_to_blog</source>

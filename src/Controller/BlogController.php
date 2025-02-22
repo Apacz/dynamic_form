@@ -54,7 +54,14 @@ final class BlogController extends AbstractController
     #[Route('/rss.xml', name: 'blog_rss', defaults: ['page' => '1', '_format' => 'xml'], methods: ['GET'])]
     #[Route('/page/{page<[1-9]\d{0,8}>}', name: 'blog_index_paginated', defaults: ['_format' => 'html'], methods: ['GET'])]
     #[Cache(smaxage: 10)]
-    public function index(Request $request, int $page, string $_format, PostRepository $posts, TagRepository $tags): Response
+    public function index(
+        Request $request,
+        int $page,
+        string $_format,
+        PostRepository $posts,
+        TagRepository $tags,
+        FormSchemaRepository $formSchemaRepository
+    ): Response
     {
         $tag = null;
         if ($request->query->has('tag')) {
@@ -68,6 +75,7 @@ final class BlogController extends AbstractController
         return $this->render('blog/index.'.$_format.'.twig', [
             'paginator' => $latestPosts,
             'tagName' => $tag?->getName(),
+            'formSchemas' => $formSchemaRepository->findAll()
         ]);
     }
 

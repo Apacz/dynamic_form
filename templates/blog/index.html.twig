@@ -3,6 +3,20 @@
 {% block body_id 'blog_index' %}
 
 {% block main %}
+    <!-- Add Form Schema Dropdown -->
+    <form method="get" action="{{ path('post_search', {formSchemaName: selectedFormSchema}) }}">
+        <div class="form-group">
+            <label for="formSchemaSelect">{{ 'Select Form Schema'|trans }}</label>
+            <select id="formSchemaSelect" name="formSchemaName" class="form-control">
+                <option value="">{{ 'Choose a form schema'|trans }}</option>
+                {% for formSchema in formSchemas %}
+                    <option value="{{ formSchema.name }}">{{ formSchema.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">{{ 'Search'|trans }}</button>
+    </form>
+
     {% for post in paginator.results %}
         {{ include('blog/_post.html.twig') }}
     {% else %}
@@ -10,7 +24,6 @@
     {% endfor %}
 
     {% if paginator.hasToPaginate %}
-
         <div class="navigation text-center">
             <ul class="pagination pagination-lg">
                 {% if paginator.hasPreviousPage %}
