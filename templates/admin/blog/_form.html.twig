@@ -43,7 +43,8 @@
 
                     data.forEach(function (field) {
                         let inputField;
-                        let fieldName = 'post[extra][' + field.name + ']';
+                        // let fieldName = 'post[extra][' + field.name + ']';
+                        let fieldName = field.name;
                         // Handle different field types
                         switch (field.type) {
                             case 'textarea':

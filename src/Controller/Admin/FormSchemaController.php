@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/admin/form_schema')]
-class FormSchemaController extends AbstractController
+final class FormSchemaController extends AbstractController
 {
     #[Route('/', name: 'app_form_schema_index', methods: ['GET'])]
     public function index(FormSchemaRepository $formSchemaRepository): Response

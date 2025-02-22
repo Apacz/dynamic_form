@@ -3,15 +3,15 @@
 {% block body %}
     <h1>Search Form</h1>
 
-    {{ form_start(form, {attr: {'novalidate': 'novalidate'}}) }}
-
+{#    {{ form_start(form, {attr: {'novalidate': 'novalidate'}}) }}#}
+    <form>
     <div class="form-group">
         {% for field in formFields %}
             <div class="form-group">
-                <label for="{{ field.name }}">{{ field.display_name }}</label>
+                <label for="{{ field.name }}">{{ field.displayName }}</label>
 
                 {% if field.type == 'text' %}
-                    <input type="text" name="{{ field.name }}" id="{{ field.name }}" class="form-control" value="{{ formData[field.name] ?? '' }}" placeholder="{{ field.display_name }}">
+                    <input type="text" name="{{ field.name }}" id="{{ field.name }}" class="form-control" value="{{ formData[field.name] ?? '' }}" placeholder="{{ field.displayName }}">
 
                 {% elseif field.type == 'number' %}
                     <input type="number" name="{{ field.name }}" id="{{ field.name }}" class="form-control" value="{{ formData[field.name] ?? '' }}" step="0.01">
@@ -67,6 +67,6 @@
             <i class="fa fa-list-alt" aria-hidden="true"></i> Back to list
         </a>
     {% endif %}
-
-    {{ form_end(form) }}
+    </form>
+{#    {{ form_end(form) }}#}
 {% endblock %}

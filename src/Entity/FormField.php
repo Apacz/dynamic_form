@@ -138,6 +138,15 @@ class FormField
         return $this;
     }
 
+    public function getOptions(): array
+    {
+        if ($this->OptionList) {
+            return json_decode($this->OptionList, true) ?? [];
+        }
+
+        return [];
+    }
+
     public function __toString(): string
     {
         return $this->displayName;
