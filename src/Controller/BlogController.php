@@ -108,7 +108,7 @@ final class BlogController extends AbstractController
 
 
     #[Route('/{formSchemaName}/search', name: 'post_search', methods: ['GET', 'POST'])]
-    public function searchByFromSchema(Request $request, string $formSchemaName, FormSchemaRepository $formSchemaRepository, PostFormValueRepository $postFormValueRepository)
+    public function searchByFromSchema(Request $request, string $formSchemaName, FormSchemaRepository $formSchemaRepository, PostRepository $postRepository)
     {
         /** @var FormSchema|null $formSchema */
         $formSchema = $formSchemaRepository->findOneBy(['name' => $formSchemaName]);
@@ -123,9 +123,6 @@ final class BlogController extends AbstractController
         foreach ($formFields as $field) {
             // Initialize a new input field based on the field type
             switch ($field->getType()) {
-                case 'text':
-                    $formData[$field->getName()] = $request->get($field->getName(), ''); // For text fields
-                    break;
                 case 'date':
                 case 'dateTime':
                     $formData[$field->getName() . '_from'] = $request->get($field->getName() . '_from', ''); // From date range
@@ -148,14 +145,26 @@ final class BlogController extends AbstractController
                 case 'url':
                     $formData[$field->getName()] = $request->get($field->getName(), null);
                     break;
-
+                case 'text':
+                case 'textarea':
+                default:
+                    $formData[$field->getName()] = $request->get($field->getName(), ''); // For text fields
+                    break;
                 // Add additional cases for other types like 'checkbox', 'email', etc.
             }
         }
-
+        $data = $request->query->all();
         // Handling POST search logic here, if needed.
-        if ($request->isMethod('POST')) {
-            $postFormValues = $postFormValueRepository->searchByFields($formData);
+        if ($request->isMethod('POST') || !empty($data)) {
+            if (!empty($data)) {
+                $formData = $data;
+            }
+            $formData = array_filter($formData, function ($value) {
+                return !empty($value); // Removes empty strings, null, false, and empty arrays
+            });
+
+            $postFormValues = $postRepository->searchByFields($formData);
+//            var_dump(count($postFormValues));exit;
             // Perform the search logic (e.g., querying the database using the values from $formData)
             // You could search based on the inputs and return the results
             // For now, we can just return the form data as a placeholder

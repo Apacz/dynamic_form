@@ -39,11 +39,9 @@
 
     <h2>Results</h2>
     {% if postFormValues is not empty %}
-        <ul>
-            {% for postFormValue in postFormValues %}
-                <li>{{ postFormValue.value }} - {{ postFormValue.field.name }} - {{ postFormValue.schema.name }}</li>
-            {% endfor %}
-        </ul>
+        {% for post in postFormValues %}
+            {{ include('blog/_post.html.twig') }}
+        {% endfor %}
     {% else %}
         <p>No results found.</p>
     {% endif %}

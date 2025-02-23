@@ -106,8 +106,8 @@ class PostRepository extends ServiceEntityRepository
 
     public function searchByFields(array $criteria)
     {
-        $qb = $this->createQueryBuilder('pfv')
-            ->leftJoin('pfv.post', 'p')
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.postFormValues', 'pfv')
             ->leftJoin('pfv.schema', 's')
             ->leftJoin('pfv.field', 'f');
 
@@ -124,13 +124,13 @@ class PostRepository extends ServiceEntityRepository
                 $dateTo = $criteria[$fieldName . '_to'] ?? null;
 
                 if ($dateFrom && $dateTo) {
-                    $qb->andWhere('p.createdAt BETWEEN :dateFrom AND :dateTo')
+                    $qb->orWhere('p.createdAt BETWEEN :dateFrom AND :dateTo')
                         ->setParameter('dateFrom', $dateFrom)
                         ->setParameter('dateTo', $dateTo);
                 }
             } else {
                 // For text, checkbox, number, etc.
-                $qb->andWhere('f.name = :fieldName AND pfv.value LIKE :value')
+                $qb->orWhere('f.name = :fieldName AND pfv.value LIKE :value')
                     ->setParameter('fieldName', $key)
                     ->setParameter('value', '%' . $value . '%');
             }

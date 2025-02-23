@@ -4,15 +4,15 @@
 
 {% block main %}
     <!-- Add Form Schema Dropdown -->
-    <div class="form-group">
-        <label for="formSchemaSelect">{{ 'Select Form Schema'|trans }}</label>
-        <select id="formSchemaSelect" name="formSchemaName" class="form-control">
-            <option value="">{{ 'Choose a form schema'|trans }}</option>
-            {% for formSchema in formSchemas %}
-                <option value="{{ formSchema.name }}">{{ formSchema.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
+{#    <div class="form-group">#}
+{#        <label for="formSchemaSelect">{{ 'Select Form Schema'|trans }}</label>#}
+{#        <select id="formSchemaSelect" name="formSchemaName" class="form-control">#}
+{#            <option value="">{{ 'Choose a form schema'|trans }}</option>#}
+{#            {% for formSchema in formSchemas %}#}
+{#                <option value="{{ formSchema.name }}">{{ formSchema.name }}</option>#}
+{#            {% endfor %}#}
+{#        </select>#}
+{#    </div>#}
 
 
     {% for post in paginator.results %}
@@ -61,18 +61,27 @@
         </div>
     {% endif %}
     <script>
-        document.getElementById('formSchemaSelect').addEventListener('change', function() {
-            let selectedSchema = this.value;
-            if (selectedSchema) {
-                window.location.href = "{{ path('post_search', {'formSchemaName': '__SCHEMA__'}) }}".replace('__SCHEMA__', selectedSchema);
-            }
-        });
+        // document.getElementById('formSchemaSelect').addEventListener('change', function() {
+        //     let selectedSchema = this.value;
+        //     if (selectedSchema) {
+        {#        window.location.href = "{{ path('post_search', {'formSchemaName': '__SCHEMA__'}) }}".replace('__SCHEMA__', selectedSchema);#}
+        //     }
+        // });
+        {#document.querySelector('.form-select').addEventListener('click', function() {#}
+        {#    let selectedSchema = this.data('value');#}
+        {#    if (selectedSchema) {#}
+        {#        window.location.href = "{{ path('post_search', {'formSchemaName': '__SCHEMA__'}) }}".replace('__SCHEMA__', selectedSchema);#}
+        {#    }#}
+        {#});#}
     </script>
 {% endblock %}
 
 {% block sidebar %}
-    {{ parent() }}
-
-    {{ show_source_code(_self) }}
-    {{ include('blog/_rss.html.twig') }}
+    {% for formSchema in formSchemas %}
+        <a href="{{ path('post_search', {'formSchemaName': formSchema.name}) }}">{{ formSchema.displayName }}</a><br/>
+    {% endfor %}
+{#    {{ parent() }}#}
+{##}
+{#    {{ show_source_code(_self) }}#}
+{#    {{ include('blog/_rss.html.twig') }}#}
 {% endblock %}

@@ -17,6 +17,7 @@ use App\Form\Type\DateTimePickerType;
 use App\Form\Type\TagsInputType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -51,7 +52,9 @@ final class PostType extends AbstractType
         // server-side validation errors from the browser. To temporarily disable
         // this validation, set the 'required' attribute to 'false':
         // $builder->add('title', null, ['required' => false, ...]);
-
+        /** @var Post $object */
+        $object = $builder->getData();
+        $fieldSchema = $object->getFormSchema();
         $builder
             ->add('title', null, [
                 'attr' => ['autofocus' => true],
@@ -91,6 +94,19 @@ final class PostType extends AbstractType
                 }
             })
         ;
+//        if ($fieldSchema) {
+//            foreach ($fieldSchema->getFormFields() as $formField) {
+//                $name = $formField->getName();
+//                $label = $formField->getDisplayName();
+//
+//                $builder->add('extra['.$name.']', TextType::class, [
+//                    'label' => $label,
+//                    'mapped' => false, // Prevent Symfony from expecting an entity field
+//                    'required' => false, // Allow optional fields
+//                ]);
+//            }
+//        }
+
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
             $form = $event->getForm();
@@ -123,5 +139,10 @@ final class PostType extends AbstractType
             'data_class' => Post::class,
             'allow_extra_fields' => true, // Allow extra fields dynamically
         ]);
+    }
+
+    public function getBlockPrefix()
+    {
+        return '';
     }
 }

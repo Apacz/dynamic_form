@@ -223,6 +223,16 @@ class Post
         return $this->postFormValues;
     }
 
+    public function getPostFormValuesForField(FormField $formField): ?PostFormValue
+    {
+        foreach ($this->postFormValues as $postFormValue) {
+            if ($formField->getId() === $postFormValue->getId()) {
+                return $formField;
+            }
+        }
+
+        return null;
+    }
     public function addPostFormValue(PostFormValue $postFormValue): static
     {
         if (!$this->postFormValues->contains($postFormValue)) {
